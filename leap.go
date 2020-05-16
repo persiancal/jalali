@@ -4,13 +4,22 @@ const (
 	firstCycle = 2346
 	extraPart  = 24219858156
 	round      = 100000000000
+
+	leapCycle   = 2820
+	leapInCycle = 683
 )
 
-// leapStatus checks if the Jalali year is leap or not and how many full leap has passed since the first cycle start
+// leapStatus checks if the Jalali year is leap or not and how many full leap has
+// passed since the current cycle start
 func leapStatus(year int) (int, bool) {
 	extraDays := (year + firstCycle) * extraPart
 	fullLeap := extraDays / round
 	thisYearExtra := extraDays - (fullLeap * round)
+	// Are we in the second leap?
+	// TODO: Just for fun, add the third cycle
+	if year > leapCycle-firstCycle {
+		fullLeap -= leapInCycle
+	}
 	return fullLeap, thisYearExtra < extraPart
 }
 
