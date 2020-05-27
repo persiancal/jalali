@@ -15,8 +15,8 @@ const (
 )
 
 const (
-	jEpocDay        = 11
-	jEpocMonth      = 10 // Dey
+	jEpocDay        = 10 // Zero based
+	jEpocMonth      = 9  // Dey, zero based
 	jEpocYear       = 1348
 	jEpocDiff       = 286 // Epoch day is the 286th day in jalali year, (zero based)
 	jEpocWDay       = time.Thursday
@@ -31,22 +31,17 @@ var (
 	jAccuonthLen = [12]int{0, 31, 62, 93, 124, 155, 186, 216, 246, 276, 306, 336}
 )
 
-type jTime struct {
-	year, month, day, hour, minute, second int
-}
-
 // secToJTime converts the sec (positive only) to day, hour minute and seconds.
 // TODO : handle negative values for old times?
-func secToJTime(sec int) jTime {
-	j := jTime{}
-	j.day = sec / secInDay
+func secToDays(sec int) (day, hour, minute, second int) {
+	day = sec / secInDay
 	sec %= secInDay
-	j.hour = sec / secInHour
+	hour = sec / secInHour
 	sec %= secInHour
-	j.minute = sec / secInMin
-	j.second = sec % secInMin
+	minute = sec / secInMin
+	second = sec % secInMin
 
-	return j
+	return
 }
 
 // TODO: check if instead of error we need to panic, i.e, we generate the day and is
@@ -101,9 +96,9 @@ func dayToYear(days int) (int, int) {
 
 	if days < 0 {
 		direction = -1
-		//current = jEpocYear - 1
 	}
 
+	// TODO: Predict and jump to the nearest year, this loop is shit.
 	for ; ; current += direction {
 		ln := jYearLen
 		if IsLeap(current) {
@@ -117,4 +112,15 @@ func dayToYear(days int) (int, int) {
 	}
 
 	return current, days
+}
+
+func dayToJTime(days int) (year, month, day int, err error) {
+	var remains int
+	year, remains = dayToYear(days)
+	month, day, err = dayToMonth(remains)
+	if err != nil {
+		return 0, 0, 0, fmt.Errorf("converting date failed: %w", err)
+	}
+
+	return
 }

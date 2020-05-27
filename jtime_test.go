@@ -1,6 +1,7 @@
 package jalali
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -30,21 +31,27 @@ func TestWeekDay(t *testing.T) {
 	}
 }
 
-func TestDayToYear(t *testing.T) {
-	// This test is not very effective. it depends on the same code and the leap year
+func TestDayToJTime(t *testing.T) {
+	// This test is not reliable. it depends on the same code and the leap year
 	// function which can be wrong
-	current := jEpocDiff
-	for i := 0; i < 300; i++ {
+	month := jEpocMonth
+	day := jEpocDay
+	for i := 0; i < 100; i++ {
 		if IsLeap(i + jEpocYear - 1) {
-			current--
+			day--
+			if day <= 0 {
+				month--
+				day = jMonthLen[month-1]
+			}
 		}
-		y, d := dayToYear(i * 365)
+		y, m, d, err := dayToJTime(i * 365)
+		require.NoError(t, err)
 		assert.Equal(t, jEpocYear+i, y)
-		assert.Equal(t, current, d)
-
+		assert.Equal(t, month, m, fmt.Sprintf("%d - %d - %d", i, month, d))
+		assert.Equal(t, day, d)
 	}
 
-	current = jEpocDiff
+	current := jEpocDiff
 	for i := 0; i < 300; i++ {
 		if IsLeap(jEpocYear - i + 1) {
 			current++
@@ -54,5 +61,8 @@ func TestDayToYear(t *testing.T) {
 		assert.Equal(t, current, d)
 
 	}
+}
+
+func TestDaysToJTime(t *testing.T) {
 
 }
