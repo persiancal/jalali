@@ -16,7 +16,7 @@ const (
 
 const (
 	jEpocDay        = 10 // Zero based
-	jEpocMonth      = 9  // Dey, zero based
+	jEpocMonth      = 9  // Dey (Month name is Dey), zero based
 	jEpocYear       = 1348
 	jEpocDiff       = 286 // Epoch day is the 286th day in jalali year, (zero based)
 	jEpocWDay       = time.Thursday
@@ -114,12 +114,37 @@ func dayToYear(days int) (int, int) {
 	return current, days
 }
 
+//Warning: The result for month and day are zero based, but year is not
 func dayToJTime(days int) (year, month, day int, err error) {
 	var remains int
 	year, remains = dayToYear(days)
 	month, day, err = dayToMonth(remains)
 	if err != nil {
 		return 0, 0, 0, fmt.Errorf("converting date failed: %w", err)
+	}
+
+	return
+}
+
+func timeToJTime(t time.Time) (year, month, day, hour, minute, sec int, err error) {
+	unix := t.Unix()
+	days, remains := unix/secInDay, unix%secInDay
+	if remains < 0 {
+		days++
+		remains = -remains
+	}
+	year, month, day, err = dayToJTime(int(days))
+	if err != nil {
+		return
+	}
+	// Month and day are zero based
+	month++
+	day++
+
+	var d int
+	d, hour, minute, sec = secToDays(int(remains))
+	if d != 0 {
+		panic("invalid")
 	}
 
 	return

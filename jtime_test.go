@@ -62,7 +62,3 @@ func TestDayToJTime(t *testing.T) {
 
 	}
 }
-
-func TestDaysToJTime(t *testing.T) {
-
-}

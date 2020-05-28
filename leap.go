@@ -2,8 +2,7 @@ package jalali
 
 const (
 	firstCycle = 2346
-	extraPart  = 24219858156
-	round      = 100000000000
+	extraPart  = 0.24219858156
 
 	leapCycle   = 2820
 	leapInCycle = 683
@@ -12,9 +11,9 @@ const (
 // leapStatus checks if the Jalali year is leap or not and how many full leap has
 // passed since the current cycle start
 func leapStatus(year int) (int, bool) {
-	extraDays := (year + firstCycle) * extraPart
-	fullLeap := extraDays / round
-	thisYearExtra := extraDays - (fullLeap * round)
+	extraDays := float64(year+firstCycle) * extraPart
+	fullLeap := int(extraDays)
+	thisYearExtra := extraDays - float64(fullLeap)
 	// Are we in the second leap?
 	// TODO: Just for fun, add the third cycle
 	if year > leapCycle-firstCycle {
